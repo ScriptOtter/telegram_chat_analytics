@@ -6,13 +6,13 @@
 
 Склонируйте репозиторий с помощью Git:
 
-bash
+```bash
 git clone https://github.com/ScriptOtter/telegram_chat_analytics.git
-
+```
 ### Настройка .env
 
 Создайте файл .env в корне проекта и заполните его следующими переменными:
-
+```text
 NODE_ENV="production"
 
 WEB_PORT=3000
@@ -28,19 +28,20 @@ DATABASE_URL=postgresql://telegram:telegram@postgres:5432/telegram
 REDIS_PASSWORD=redis_pass
 
 REDIS_CACHE_TIME=1200
-
+```
 ### Запуск
 
 Сначала запустите Docker Compose для развертывания контейнеров:
 
-bash
+```bash
 docker-compose up -d
-
+```
 Теперь ваше приложение доступно по адресу web:[http://localhost:3000](http://localhost:3000), bot:[http://localhost:4000](http://localhost:4000).
 
-Тесты
+Запуск тестов
+```bash
 npm run test:watch
-
+```
 ## 2. Архитектура
 
 Проект состоит из следующих основных компонентов:

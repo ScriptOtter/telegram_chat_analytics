@@ -34,7 +34,7 @@ REDIS_CACHE_TIME=1200
 Сначала запустите Docker Compose для развертывания контейнеров:
 
 ```bash
-docker-compose up -d
+docker-compose up --build
 ```
 Теперь ваше приложение доступно по адресу web:[http://localhost:3000](http://localhost:3000), bot:[http://localhost:4000](http://localhost:4000).
 

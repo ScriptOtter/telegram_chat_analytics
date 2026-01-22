@@ -1,0 +1,85 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: telegram-analytics-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: telegram
+      POSTGRES_USER: telegram
+      POSTGRES_PASSWORD: telegram
+
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: telegram-analytics-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+
+    networks:
+      - app-network
+
+  bot:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: telegram-analytics-bot
+    restart: unless-stopped
+
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - BOT_TOKEN=${BOT_TOKEN:-your-telegram-bot-token-here}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379
+      - PORT=${SERVER_PORT}
+    ports:
+      - "${SERVER_PORT}:4000"
+    volumes:
+      - ./bot:/app
+      - /app/node_modules
+      - ./logs/bot:/app/logs
+
+    networks:
+      - app-network
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:4000/api
+    container_name: telegram-analytics-web
+    restart: unless-stopped
+    depends_on:
+      - bot
+    environment:
+      - NODE_ENV=${NODE_ENV}
+    ports:
+      - "${WEB_PORT}:3000"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - app-network
+    command: npm start
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  app-network:

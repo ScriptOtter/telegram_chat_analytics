@@ -1,4 +1,4 @@
-# TELEGRAM ANAKYTICS BOT
+# TELEGRAM ANALYTICS BOT
 
 ## 1. Запуск проекта
 
